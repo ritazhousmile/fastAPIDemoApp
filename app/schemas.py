@@ -1,7 +1,10 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from pydantic.types import conint
+
+if TYPE_CHECKING:
+    from . import models
 
 
 class PostBase(BaseModel):
@@ -17,14 +20,23 @@ class PostResponse(PostBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class Post(PostBase):
+    id: int
+    created_at: datetime
+    owner_id: int
+    owner: "UserOut"
+
+    class Config:
+        from_attributes = True
 
 class PostOut(BaseModel):
     Post: PostResponse
     votes: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserOut(BaseModel):
     id: int
@@ -32,7 +44,7 @@ class UserOut(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserCreate(BaseModel):
     email: EmailStr
